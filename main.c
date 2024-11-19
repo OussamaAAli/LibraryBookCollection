@@ -90,7 +90,10 @@ void mainMenu()
         printf("\n--- Main Menu ---\n");
         printf("1. Register as a User\n");
         printf("2. Register as a Tutor\n");
-        printf("3. Exit\n");
+        printf("3. Borrow a book \n");
+        printf("4. Modify contact details\n");
+        printf("5. Modify Book Details (Tutors Only)\n");
+        printf("6. Exit\n");
         printf("Enter your choice: ");
         validInput = scanf("%d", &choice);
 
@@ -117,14 +120,20 @@ void mainMenu()
         registerTutor();
         break;
     case 3:
-        printf("GoodBy\n");
+        borrowBook();
+        break;
+    case 4:
+        ModifyContactDetails();
+        break;
+    case 5:
+        modifyBookDetails();
+        break;
+    case 6:
+        printf("Goodbye!\n");
         exit(0);
     default:
         printf("Failed, please try again ! \n");
         mainMenu();
-
-
-
     }
 
 }
@@ -138,6 +147,22 @@ void registerTutor()
 {
     printf("Tutor registration process\n");
 }
+
+void borrowBook()
+{
+    printf("Borrow a book function\n");
+}
+
+void ModifyContactDetails()
+{
+    printf("Modify Contact function\n");
+}
+
+void modifyBookDetails()
+{
+    printf("Modify book function\n");
+}
+
 
 int main()
 {

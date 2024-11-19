@@ -1,5 +1,6 @@
 # depslib dependency file v1.0
-1731960397 source:d:\ing-1\c\codeblocks\librarybookcollection\main.c
+1732054972 source:d:\ing-1\c\codeblocks\librarybookcollection\main.c
 	<stdio.h>
 	<stdlib.h>
+	<stdbool.h>
 
