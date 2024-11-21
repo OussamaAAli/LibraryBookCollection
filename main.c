@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
+#include <string.h>
 
 typedef struct
 {
@@ -80,6 +82,132 @@ void displayUsrDetails(User u);
 void displayTutorDetails(Tutor t);
 
 
+void printPersonDetail(Person *person)
+{
+    printf(" ID : %d\n", person->idPerson);
+    printf("Name : %s %s\n");
+    printf(" Date of Birth : %d %s %d\n", person->dateOfBirth.day, person->dateOfBirth.month, person->dateOfBirth.year);
+    printf("Address : %d, %s, %d\n", person->adress.numberOfHouse, person->adress.street, person->adress.postalCode);
+
+}
+
+void registerUser()
+{
+    User *newUser = (User *)malloc(sizeof(User));
+    if(!newUser)
+    {
+        printf("Memory allocation failed ");
+        return;
+    }
+
+
+    printf("Enter first name : ");
+    scanf("%s", newUser->person.firstName);
+
+    printf("Enter last name : ");
+    scanf("%s",newUser->person.lastName);
+
+    printf("Enter date of birth in the format: DD MM YYYY (with a space between each part).");
+    scanf("%d %s %d", &newUser->person.dateOfBirth.day, newUser->person.dateOfBirth.month, &newUser->person.dateOfBirth.year);
+
+    printf("Enter your house number :");
+    scanf("%d", &newUser->person.adress.numberOfHouse);
+
+    while (getchar() != '\n');
+
+    printf("Enter a street : ");
+    scanf(" %[^\n]%*c", &newUser->person.adress.street);
+
+    printf("Enter your postal code :");
+    scanf("%d", &newUser->person.adress.postalCode);
+
+    printf("Full Address: %d, %s ,%d \n", newUser->person.adress.numberOfHouse, newUser->person.adress.street, newUser->person.adress.postalCode);
+
+
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    newUser->person.idPerson = (tm.tm_year + 1900) * 1000 + (tm.tm_yday + 1) * 100 + userCounter++;
+
+    printf("Id person : %d \n", newUser->person.idPerson);
+
+    totalUsers++;
+    user = realloc(user, totalUsers * sizeof(user));
+    user[totalUsers - 1] = *newUser;
+
+    printf("User registration successfully completed !\n");
+
+
+    printPersonDetail(&newUser->person);
+
+
+}
+
+void registerTutor()
+{
+
+    Tutor *newTutor = (Tutor *)malloc(sizeof(Tutor));
+    if(!newTutor)
+    {
+        printf("Memory allocation failed \n");
+        return;
+    }
+
+    printf("\n--- Register a New Tutor ---\n");
+
+    printf("Enter first name: ");
+    scanf("%s", newTutor->person.firstName);
+
+    printf("Enter last name: ");
+    scanf("%s", newTutor->person.lastName);
+
+    printf("Enter date of birth in the format: DD MM YYYY (with a space between each part) ");
+    scanf("%d %s %d", &newTutor->person.dateOfBirth.day, &newTutor->person.dateOfBirth.month, &newTutor->person.dateOfBirth.year);
+
+    printf("Enter your house number : ");
+    scanf("%d", &newTutor->person.adress.numberOfHouse);
+
+    while (getchar() != '\n');
+
+    printf("Enter a street : ");
+    scanf("%[^\n]%*c", &newTutor->person.adress.street);
+
+
+    printf("Enter your postal code :");
+    scanf("%d", &newTutor->person.adress.postalCode);
+
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+
+    newTutor->tutorID = (tm.tm_year+1900)*1000 + (tm.tm_yday+1)*100 + tutorCounter++;
+
+    printf("Id user %d", newTutor->tutorID);
+
+    newTutor->managedBooks = NULL;
+    newTutor->totalBook = 0;
+
+    printPersonDetail(&newTutor->person);
+
+
+}
+
+
+
+void borrowBook()
+{
+    printf("Borrow a book function\n");
+}
+
+void ModifyContactDetails()
+{
+    printf("Modify Contact function\n");
+}
+
+void modifyBookDetails()
+{
+    printf("Modify book function\n");
+}
+
+
 void mainMenu()
 {
     int choice, validInput;
@@ -113,7 +241,7 @@ void mainMenu()
     {
 
     case 1 :
-        registerTutor();
+        registerUser();
         break;
 
     case 2:
@@ -138,34 +266,9 @@ void mainMenu()
 
 }
 
-void registerUser()
-{
-    printf("User registration process\n");
-}
-
-void registerTutor()
-{
-    printf("Tutor registration process\n");
-}
-
-void borrowBook()
-{
-    printf("Borrow a book function\n");
-}
-
-void ModifyContactDetails()
-{
-    printf("Modify Contact function\n");
-}
-
-void modifyBookDetails()
-{
-    printf("Modify book function\n");
-}
-
-
 int main()
 {
+
     mainMenu();
     return 0;
 }

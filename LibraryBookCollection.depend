@@ -1,6 +1,8 @@
 # depslib dependency file v1.0
-1732054972 source:d:\ing-1\c\codeblocks\librarybookcollection\main.c
+1732209057 source:d:\ing-1\c\codeblocks\librarybookcollection\main.c
 	<stdio.h>
 	<stdlib.h>
 	<stdbool.h>
+	<time.h>
+	<string.h>
 
