@@ -84,10 +84,11 @@ void displayTutorDetails(Tutor t);
 
 void printPersonDetail(Person *person)
 {
-    printf(" ID : %d\n", person->idPerson);
-    printf("Name : %s %s\n");
-    printf(" Date of Birth : %d %s %d\n", person->dateOfBirth.day, person->dateOfBirth.month, person->dateOfBirth.year);
+    printf("ID : %d\n", person->idPerson);
+    printf("Full Name : %s %s\n", person->firstName, person->lastName);
+    printf("Date of Birth : %d %s %d\n", person->dateOfBirth.day, person->dateOfBirth.month, person->dateOfBirth.year);
     printf("Address : %d, %s, %d\n", person->adress.numberOfHouse, person->adress.street, person->adress.postalCode);
+    printf("\n \n");
 
 }
 
@@ -107,7 +108,7 @@ void registerUser()
     printf("Enter last name : ");
     scanf("%s",newUser->person.lastName);
 
-    printf("Enter date of birth in the format: DD MM YYYY (with a space between each part).");
+    printf("Enter date of birth in the format: DD MM YYYY (with a space between each part) : ");
     scanf("%d %s %d", &newUser->person.dateOfBirth.day, newUser->person.dateOfBirth.month, &newUser->person.dateOfBirth.year);
 
     printf("Enter your house number :");
@@ -116,13 +117,12 @@ void registerUser()
     while (getchar() != '\n');
 
     printf("Enter a street : ");
-    scanf(" %[^\n]%*c", &newUser->person.adress.street);
+    //scanf(" %[^\n]%*c", &newUser->person.adress.street);
+    fgets(newUser->person.adress.street, sizeof(newUser->person.adress.street),stdin );
+    newUser->person.adress.street[strcspn(newUser->person.adress.street, "\n")] = '\0';
 
     printf("Enter your postal code :");
     scanf("%d", &newUser->person.adress.postalCode);
-
-    printf("Full Address: %d, %s ,%d \n", newUser->person.adress.numberOfHouse, newUser->person.adress.street, newUser->person.adress.postalCode);
-
 
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
@@ -131,14 +131,22 @@ void registerUser()
     printf("Id person : %d \n", newUser->person.idPerson);
 
     totalUsers++;
-    user = realloc(user, totalUsers * sizeof(user));
+    user = realloc(user, totalUsers * sizeof(User));
+    if (!user) {
+        printf("Memory allocation failed\n");
+        free(newUser);
+        return;
+    }
+
     user[totalUsers - 1] = *newUser;
-
-    printf("User registration successfully completed !\n");
-
+    printf("\n \n \n");
+    printf(" **** User registration successfully completed! **** \n");
+    printf("\n \n \n");
 
     printPersonDetail(&newUser->person);
 
+    free(newUser);
+    mainMenu();
 
 }
 
@@ -185,7 +193,15 @@ void registerTutor()
     newTutor->managedBooks = NULL;
     newTutor->totalBook = 0;
 
+    printf("\n \n \n");
+    printf(" **** Tutor registration successfully completed! **** \n");
+    printf("\n \n \n");
+
     printPersonDetail(&newTutor->person);
+
+
+    free(newTutor);
+    mainMenu();
 
 
 }
