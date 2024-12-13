@@ -117,7 +117,6 @@ void registerUser()
     while (getchar() != '\n');
 
     printf("Enter a street : ");
-    //scanf(" %[^\n]%*c", &newUser->person.adress.street);
     fgets(newUser->person.adress.street, sizeof(newUser->person.adress.street),stdin );
     newUser->person.adress.street[strcspn(newUser->person.adress.street, "\n")] = '\0';
 
@@ -132,7 +131,8 @@ void registerUser()
 
     totalUsers++;
     user = realloc(user, totalUsers * sizeof(User));
-    if (!user) {
+    if (!user)
+    {
         printf("Memory allocation failed\n");
         free(newUser);
         return;
@@ -149,6 +149,7 @@ void registerUser()
     mainMenu();
 
 }
+
 
 void registerTutor()
 {
@@ -196,17 +197,106 @@ void registerTutor()
     printf("\n \n \n");
     printf(" **** Tutor registration successfully completed! **** \n");
     printf("\n \n \n");
-
     printPersonDetail(&newTutor->person);
 
 
+
+    totalTutors++;
+    tutor = realloc(tutor, totalTutors * sizeof(Tutor));
+    if (!tutor)
+    {
+        printf("Memory allocation failed\n");
+        free(newTutor);
+        return;
+    }
+
+    tutor[totalTutors - 1] = *newTutor;
     free(newTutor);
     mainMenu();
 
 
 }
 
+void addBook(int tutorNumber)
+{
+    if (totalTutors == 0)
+    {
+        printf("\n \n *** No tutors exist. Please register a tutor first. ***\n");
+        mainMenu();
+        return;
+    }
 
+    printf("Select a tutor from the list (or enter 0 to return to the main menu):\n");
+    printf("0: Add a new tutor\n");
+    for (int i = 0; i < totalTutors; i++)
+    {
+        printf("%d: %s %s (ID: %d)\n", i + 1, tutor[i].person.firstName, tutor[i].person.lastName, tutor[i].tutorID);
+    }
+
+    int tutorInput;
+    printf("Enter tutor number: ");
+    if (scanf("%d", &tutorInput) != 1 || tutorInput < 0 || tutorInput > totalTutors)
+    {
+        printf("Invalid input. Returning to main menu.\n");
+        while (getchar() != '\n');
+        mainMenu();
+        return;
+    }
+
+    if (tutorInput == 0)
+    {
+        mainMenu();
+        return;
+    }
+
+    tutorNumber = tutor[tutorInput - 1].tutorID;
+
+    Book newBook;
+    newBook.bookID = bookCounter++;
+    newBook.tutorId = tutorNumber;
+
+    printf("Enter book name: ");
+    while (getchar() != '\n');
+    fgets(newBook.bookName, sizeof(newBook.bookName), stdin);
+    newBook.bookName[strcspn(newBook.bookName, "\n")] = '\0';
+
+    printf("Enter creation date in the format: DD MM YYYY (with a space between each part) ");
+    scanf("%d %s %d", &newBook.creationDte.day, newBook.creationDte.month, &newBook.creationDte.year);
+
+    printf("Enter quantity: ");
+    scanf("%d", &newBook.quantity);
+
+    for (int i = 0; i < totalTutors; i++)
+    {
+        if (tutor[i].tutorID == tutorNumber)
+        {
+            tutor[i].managedBooks = realloc(tutor[i].managedBooks, (tutor[i].totalBook + 1) * sizeof(Book));
+            if (!tutor[i].managedBooks)
+            {
+                printf("Memory allocation failed while adding the book!\n");
+                return;
+            }
+            tutor[i].managedBooks[tutor[i].totalBook] = newBook;
+            tutor[i].totalBook++;
+            printf("\nBook added successfully!\n\n");
+            displayBookDetails(&newBook);
+            break;
+        }
+    }
+
+    mainMenu();
+}
+
+void displayBookDetails(Book *book)
+{
+    printf("Book Details:\n");
+    printf("ID: %d\n", book->bookID);
+    printf("Name: %s\n", book->bookName);
+    printf("Creation Date: %d %s %d\n", book->creationDte.day, book->creationDte.month, book->creationDte.year);
+    printf("Quantity: %d\n", book->quantity);
+    printf("Tutor ID: %d\n", book->tutorId);
+    printf("\n\n");
+}
 
 void borrowBook()
 {
@@ -234,10 +324,11 @@ void mainMenu()
         printf("\n--- Main Menu ---\n");
         printf("1. Register as a User\n");
         printf("2. Register as a Tutor\n");
-        printf("3. Borrow a book \n");
-        printf("4. Modify contact details\n");
-        printf("5. Modify Book Details (Tutors Only)\n");
-        printf("6. Exit\n");
+        printf("3. Add a Book\n");
+        printf("4. Borrow a book \n");
+        printf("5. Modify contact details\n");
+        printf("6. Modify Book Details (Tutors Only)\n");
+        printf("0. Exit\n");
         printf("Enter your choice: ");
         validInput = scanf("%d", &choice);
 
@@ -264,16 +355,19 @@ void mainMenu()
         registerTutor();
         break;
     case 3:
-        borrowBook();
+        addBook(0);
         break;
     case 4:
-        ModifyContactDetails();
+        borrowBook();
         break;
     case 5:
-        modifyBookDetails();
+        ModifyContactDetails();
         break;
     case 6:
-        printf("Goodbye!\n");
+        modifyBookDetails();
+        break;
+    case 0:
+        printf("\n \n Goodbye! \n \n");
         exit(0);
     default:
         printf("Failed, please try again ! \n");
