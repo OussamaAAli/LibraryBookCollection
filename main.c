@@ -49,6 +49,8 @@ typedef struct
     Date creationDte;
     int quantity;
     int tutorId;
+    int borrowedById;
+    int borrowCount;
 
 
 } Book;
@@ -254,6 +256,8 @@ void addBook(int tutorNumber)
     Book newBook;
     newBook.bookID = bookCounter++;
     newBook.tutorId = tutorNumber;
+    newBook.borrowedById = -1;
+    newBook.borrowCount = 0;
 
     printf("Enter book name: ");
     while (getchar() != '\n');
@@ -300,8 +304,97 @@ void displayBookDetails(Book *book)
 
 void borrowBook()
 {
-    printf("Borrow a book function\n");
+    if (totalUsers == 0)
+    {
+        printf("\n*** No users registered. Returning to the main menu. ***\n");
+        mainMenu();
+        return;
+    }
+
+    printf("\n--- Registered Users ---\n");
+    printf("0: Return to main menu\n");
+    for (int i = 0; i < totalUsers; i++)
+    {
+        printf("%d: %s %s (ID: %d)\n", i + 1, user[i].person.firstName, user[i].person.lastName, user[i].person.idPerson);
+    }
+
+    int userInput;
+    printf("Enter the number corresponding to your user (or 0 to return to the main menu): ");
+    if (scanf("%d", &userInput) != 1 || userInput < 0 || userInput > totalUsers)
+    {
+        printf("Invalid input. Returning to the main menu.\n");
+        while (getchar() != '\n');
+        mainMenu();
+        return;
+    }
+
+    if (userInput == 0)
+    {
+        mainMenu();
+        return;
+    }
+
+    User *selectedUser = &user[userInput - 1];
+
+    printf("\n--- Available Books ---\n");
+    int availableBooks = 0;
+    for (int i = 0; i < totalTutors; i++)
+    {
+        for (int j = 0; j < tutor[i].totalBook; j++)
+        {
+            Book *currentBook = &tutor[i].managedBooks[j];
+            if (currentBook->quantity > 0)
+            {
+                printf("ID: %d | Title: %s | Quantity: %d\n", currentBook->bookID, currentBook->bookName, currentBook->quantity);
+                availableBooks++;
+            }
+        }
+    }
+
+    if (availableBooks == 0)
+    {
+        printf("\n*** No books are currently available. Returning to the main menu. ***\n");
+        mainMenu();
+        return;
+    }
+
+    int bookID;
+    printf("\nEnter the ID of the book you want to borrow: ");
+    if (scanf("%d", &bookID) != 1)
+    {
+        printf("Invalid input. Returning to the main menu.\n");
+        while (getchar() != '\n');
+        mainMenu();
+        return;
+    }
+
+    for (int i = 0; i < totalTutors; i++)
+    {
+        for (int j = 0; j < tutor[i].totalBook; j++)
+        {
+            Book *currentBook = &tutor[i].managedBooks[j];
+            if (currentBook->bookID == bookID && currentBook->quantity > 0)
+            {
+                currentBook->borrowedById = selectedUser->person.idPerson;
+                currentBook->borrowCount++;
+                currentBook->quantity--;
+
+                printf("\nBook borrowed successfully: %s\n", currentBook->bookName);
+                printf("User: %s %s (ID: %d)\n", selectedUser->person.firstName, selectedUser->person.lastName, selectedUser->person.idPerson);
+                printf("Remaining quantity: %d\n", currentBook->quantity);
+                printf("Total borrow count: %d\n", currentBook->borrowCount);
+
+                mainMenu();
+                return;
+            }
+        }
+    }
+
+    printf("\nInvalid book ID or the book is not available. Returning to the main menu.\n");
+    mainMenu();
 }
+
+
 
 void ModifyContactDetails()
 {
