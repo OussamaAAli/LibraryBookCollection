@@ -37,7 +37,8 @@ typedef struct
 {
     Person person;
     int userRegistrationNumber;
-    int borrowedBookCount;;
+    int borrowedBookCount;
+    int borrowedBook[10];
 
 } User;
 
@@ -393,13 +394,162 @@ void borrowBook()
     printf("\nInvalid book ID or the book is not available. Returning to the main menu.\n");
     mainMenu();
 }
+void modifyContactDetails(Person *person)
+{
+    int choice;
+    do
+    {
+        printf("\n--- Modify Contact Details ---\n");
+        printf("1: Modify First Name\n");
+        printf("2: Modify Last Name\n");
+        printf("3: Modify Date of Birth\n");
+        printf("4: Modify Address\n");
+        printf("0: Return to main menu\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice)
+        if ( choice != 1 || choice < 0 || choice > 4)
+        {
+            printf("Invalid input. Please try again.\n");
+            while (getchar() != '\n');
+            continue;
+        }
 
+        switch (choice)
+        {
+        case 1:
+            printf("Enter new first name: ");
+            while (getchar() != '\n');
+            fgets(person->firstName, sizeof(person->firstName), stdin);
+            person->firstName[strcspn(person->firstName, "\n")] = '\0';
+            printf("\nFirst name updated successfully!\n");
+            break;
 
+        case 2:
+            printf("Enter new last name: ");
+            while (getchar() != '\n');
+            fgets(person->lastName, sizeof(person->lastName), stdin);
+            person->lastName[strcspn(person->lastName, "\n")] = '\0';
+            printf("\nLast name updated successfully!\n");
+            break;
+
+        case 3:
+            printf("Enter new date of birth (DD MM YYYY): ");
+            scanf("%d %s %d", &person->dateOfBirth.day, person->dateOfBirth.month, &person->dateOfBirth.year);
+            printf("\nDate of birth updated successfully!\n");
+            break;
+
+        case 4:
+            printf("Enter new house number: ");
+            scanf("%d", &person->adress.numberOfHouse);
+            while (getchar() != '\n');
+            printf("Enter new street: ");
+            fgets(person->adress.street, sizeof(person->adress.street), stdin);
+            person->adress.street[strcspn(person->adress.street, "\n")] = '\0';
+            printf("Enter new postal code: ");
+            scanf("%d", &person->adress.postalCode);
+            printf("\nAddress updated successfully!\n");
+            break;
+
+        case 0:
+            printf("\nReturning to main menu.\n");
+            return;
+
+        default:
+            printf("Invalid choice. Please try again.\n");
+        }
+
+        printf("\n--- Updated Details ---\n");
+        printPersonDetail(person);
+    }
+    while (choice != 0);
+}
+
+void modifyUserContactDetails()
+{
+    if (totalUsers == 0)
+    {
+        printf("\nNo users registered. Redirecting to the main menu...\n");
+        mainMenu();
+        return;
+    }
+
+    printf("\n--- Registered Users ---\n");
+    for (int i = 0; i < totalUsers; i++)
+    {
+        printf("%d: %s %s (ID: %d)\n", i + 1, user[i].person.firstName, user[i].person.lastName, user[i].person.idPerson);
+    }
+
+    int userInput;
+    printf("Select a user by number: ");
+    scanf("%d", &userInput);
+
+    if (userInput < 1 || userInput > totalUsers)
+    {
+        printf("Invalid selection. Returning to the main menu...\n");
+        return;
+    }
+
+    modifyContactDetails(&user[userInput - 1].person);
+}
+
+void modifyTutorContactDetails()
+{
+    if (totalTutors == 0)
+    {
+        printf("\nNo tutors registered. Redirecting to the main menu...\n");
+        mainMenu();
+        return;
+    }
+
+    printf("\n--- Registered Tutors ---\n");
+    for (int i = 0; i < totalTutors; i++)
+    {
+        printf("%d: %s %s (ID: %d)\n", i + 1, tutor[i].person.firstName, tutor[i].person.lastName, tutor[i].tutorID);
+    }
+
+    int tutorInput;
+    printf("Select a tutor by number: ");
+    scanf("%d", &tutorInput);
+
+    if (tutorInput < 1 || tutorInput > totalTutors)
+    {
+        printf("Invalid selection. Returning to the main menu...\n");
+        return;
+    }
+
+    modifyContactDetails(&tutor[tutorInput - 1].person);
+}
 
 void ModifyContactDetails()
 {
-    printf("Modify Contact function\n");
+    int mainChoice;
+
+
+    printf("\n--- Modify Contact Details ---\n");
+    printf("1: Modify User Contact Details\n");
+    printf("2: Modify Tutor Contact Details\n");
+    printf("0: Return to main menu\n");
+    printf("Enter your choice: ");
+    scanf("%d", &mainChoice);
+
+    switch (mainChoice)
+    {
+    case 1:
+        modifyUserContactDetails();
+        break;
+    case 2:
+        modifyTutorContactDetails();
+        break;
+    case 0:
+        printf("Returning to the main menu...\n");
+        mainMenu();
+        return;
+    default:
+        printf("Invalid choice. Please try again.\n");
+    }
+
 }
+
 
 void modifyBookDetails()
 {
@@ -421,7 +571,7 @@ void mainMenu()
         printf("4. Borrow a book \n");
         printf("5. Modify contact details\n");
         printf("6. Modify Book Details (Tutors Only)\n");
-        printf("0. Exit\n");
+        printf("0. Exit\n\n\n");
         printf("Enter your choice: ");
         validInput = scanf("%d", &choice);
 
