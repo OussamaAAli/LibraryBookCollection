@@ -70,8 +70,10 @@ typedef struct
 
 User *user = NULL;
 Tutor *tutor = NULL;
+Book *books = NULL;
 int totalUsers = 0;
 int totalTutors = 0;
+int totalBooks = 0;
 int userCounter = 1;
 int bookCounter = 1;
 int tutorCounter = 1;
@@ -550,11 +552,115 @@ void ModifyContactDetails()
     }
 
 }
-
-
 void modifyBookDetails()
 {
-    printf("Modify book function\n");
+       if (totalTutors == 0)
+    {
+        printf("\nNo tutors registered. Returning to the main menu...\n");
+        mainMenu();
+        return;
+    }
+
+    printf("\n--- Available Books ---\n");
+    int availableBooks = 0;
+    for (int i = 0; i < totalTutors; i++)
+    {
+        for (int j = 0; j < tutor[i].totalBook; j++)
+        {
+            Book *currentBook = &tutor[i].managedBooks[j];
+            if (currentBook->quantity > 0)
+            {
+                printf("ID: %d | Title: %s | Quantity: %d\n", currentBook->bookID, currentBook->bookName, currentBook->quantity);
+                availableBooks++;
+            }
+        }
+    }
+
+    if (availableBooks == 0)
+    {
+        printf("\n*** No books are currently available for modification. Returning to the main menu. ***\n");
+        mainMenu();
+        return;
+    }
+
+    int bookID;
+    printf("\nEnter the ID of the book you want to modify: ");
+    if (scanf("%d", &bookID) != 1)
+    {
+        printf("Invalid input. Returning to the main menu.\n");
+        while (getchar() != '\n');
+        mainMenu();
+        return;
+    }
+
+    Book *selectedBook = NULL;
+    for (int i = 0; i < totalTutors; i++)
+    {
+        for (int j = 0; j < tutor[i].totalBook; j++)
+        {
+            if (tutor[i].managedBooks[j].bookID == bookID)
+            {
+                selectedBook = &tutor[i].managedBooks[j];
+                break;
+            }
+        }
+        if (selectedBook)
+            break;
+    }
+
+    if (!selectedBook)
+    {
+        printf("\nBook ID not found. Returning to the main menu.\n");
+        mainMenu();
+        return;
+    }
+
+    int choice;
+    do
+    {
+        printf("\n--- Modify Book Details ---\n");
+        printf("1: Modify Book Name\n");
+        printf("2: Modify Creation Date\n");
+        printf("3: Modify Quantity\n");
+        printf("0: Return to main menu\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice)
+        {
+        case 1:
+            printf("Enter new book name: ");
+            while (getchar() != '\n');
+            fgets(selectedBook->bookName, sizeof(selectedBook->bookName), stdin);
+            selectedBook->bookName[strcspn(selectedBook->bookName, "\n")] = '\0';
+            printf("\nBook name updated successfully!\n");
+            break;
+
+        case 2:
+            printf("Enter new creation date (DD MM YYYY): ");
+            scanf("%d %s %d", &selectedBook->creationDte.day, selectedBook->creationDte.month, &selectedBook->creationDte.year);
+            printf("\nCreation date updated successfully!\n");
+            break;
+
+        case 3:
+            printf("Enter new quantity: ");
+            scanf("%d", &selectedBook->quantity);
+            printf("\nQuantity updated successfully!\n");
+            break;
+
+        case 0:
+            printf("\nReturning to main menu.\n");
+            mainMenu();
+            return;
+
+        default:
+            printf("Invalid choice. Please try again.\n");
+        }
+
+        printf("\n--- Updated Book Details ---\n");
+        displayBookDetails(selectedBook);
+    }
+    while (choice != 0);
 }
 
 
