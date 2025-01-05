@@ -4,6 +4,8 @@
 #include <time.h>
 #include <string.h>
 
+#define LIBRARY_FILE "libraryFile"
+
 typedef struct
 {
     int day;
@@ -64,7 +66,6 @@ typedef struct
     int totalBook;
 
 
-
 } Tutor;
 
 
@@ -79,12 +80,86 @@ int bookCounter = 1;
 int tutorCounter = 1;
 
 
+extern User *user;
+extern Tutor *tutor;
+extern Book *books;
+extern int totalUsers;
+extern int totalTutors;
+extern int totalBooks;
+
+
 void mainMenu();
 void registerUser();
 void registerTutor();
 void addBook(int tutorNumber);
 void displayUsrDetails(User u);
 void displayTutorDetails(Tutor t);
+void initializeLibraryFile();
+void saveLibraryData();
+
+void initializeLibraryFile() {
+    FILE *file = fopen(LIBRARY_FILE, "r");
+    if (file == NULL) {
+
+        file = fopen(LIBRARY_FILE, "w");
+        if (file == NULL) {
+            perror("Error while creating the file.");
+            exit(EXIT_FAILURE);
+        }
+        printf("File '%s' created successfully.\n", LIBRARY_FILE);
+    } else {
+
+        fread(&totalUsers, sizeof(int), 1, file);
+        fread(&totalTutors, sizeof(int), 1, file);
+        fread(&totalBooks, sizeof(int), 1, file);
+
+        if (totalUsers > 0) {
+            user = malloc(totalUsers * sizeof(User));
+            fread(user, sizeof(User), totalUsers, file);
+        }
+
+        if (totalTutors > 0) {
+            tutor = malloc(totalTutors * sizeof(Tutor));
+            fread(tutor, sizeof(Tutor), totalTutors, file);
+        }
+
+        if (totalBooks > 0) {
+            books = malloc(totalBooks * sizeof(Book));
+            fread(books, sizeof(Book), totalBooks, file);
+        }
+
+        printf("Loaded data from : '%s'.\n", LIBRARY_FILE);
+        fclose(file);
+    }
+}
+
+
+void saveLibraryData() {
+    FILE *file = fopen(LIBRARY_FILE, "w");
+    if (file == NULL) {
+        perror("Error opening the file for writing.");
+        exit(EXIT_FAILURE);
+    }
+
+    fwrite(&totalUsers, sizeof(int), 1, file);
+    fwrite(&totalTutors, sizeof(int), 1, file);
+    fwrite(&totalBooks, sizeof(int), 1, file);
+
+    if (totalUsers > 0 && user != NULL) {
+        fwrite(user, sizeof(User), totalUsers, file);
+    }
+
+    if (totalTutors > 0 && tutor != NULL) {
+        fwrite(tutor, sizeof(Tutor), totalTutors, file);
+    }
+
+    if (totalBooks > 0 && books != NULL) {
+        fwrite(books, sizeof(Book), totalBooks, file);
+    }
+
+    printf("Saved data to : '%s'.\n", LIBRARY_FILE);
+    fclose(file);
+}
 
 
 void printPersonDetail(Person *person)
@@ -718,6 +793,7 @@ void mainMenu()
         break;
     case 0:
         printf("\n \n Goodbye! \n \n");
+        saveLibraryData();
         exit(0);
     default:
         printf("Failed, please try again ! \n");
@@ -728,7 +804,9 @@ void mainMenu()
 
 int main()
 {
+    initializeLibraryFile();
 
     mainMenu();
+
     return 0;
 }
