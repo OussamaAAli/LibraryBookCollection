@@ -406,8 +406,8 @@ void modifyContactDetails(Person *person)
         printf("4: Modify Address\n");
         printf("0: Return to main menu\n");
         printf("Enter your choice: ");
-        scanf("%d", &choice)
-        if ( choice != 1 || choice < 0 || choice > 4)
+        scanf("%d", &choice);
+        if (choice < 0 || choice > 4)
         {
             printf("Invalid input. Please try again.\n");
             while (getchar() != '\n');
@@ -452,6 +452,7 @@ void modifyContactDetails(Person *person)
 
         case 0:
             printf("\nReturning to main menu.\n");
+            mainMenu();
             return;
 
         default:
